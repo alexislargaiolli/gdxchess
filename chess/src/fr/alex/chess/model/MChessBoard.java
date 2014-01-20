@@ -24,8 +24,7 @@ public class MChessBoard {
 	public MChessBoard() {
 		cases = new MCase[64];
 		pieces = new Array<MPiece>();
-		center = new Vector3(BoardSettings.caseSize * 3.5f, 0,
-				BoardSettings.caseSize * 3.5f);
+		center = new Vector3(BoardSettings.caseSize * 3.5f, 0, BoardSettings.caseSize * 3.5f);
 	}
 
 	public void initialize() {
@@ -57,7 +56,7 @@ public class MChessBoard {
 		}
 	}
 
-	public void initFromEngine(Board board) {
+	public void initFromEngine(Board board, String whiteSkin, String blackSkin) {
 		String fen = board.getFen();
 		int i = 0;
 		int iCase = 63;
@@ -70,8 +69,7 @@ public class MChessBoard {
 					iCase -= number;
 				} catch (Exception ignored) {
 					MCase c = cases[iCase];
-					MPiece piece = new MPiece(p,
-							ChessModelCreator.createPiece(p));
+					MPiece piece = new MPiece(p, ChessModelCreator.createPiece(p, isWhite(p) ? whiteSkin : blackSkin));
 					piece.setPosition(c.getPosition().x, c.getPosition().z);
 					pieces.add(piece);
 					c.setCurPiece(piece);
@@ -81,11 +79,19 @@ public class MChessBoard {
 			}
 		}
 	}
+	
+	public boolean isBlack(char p){
+		return p == 'p' || p =='r' || p=='n' || p =='b' || p == 'q' || p == 'k';
+	}
+	
+	public boolean isWhite(char p){
+		return p == 'P' || p =='R' || p=='N' || p =='B' || p == 'Q' || p == 'K';
+	}
 
 	public void movePiece(MPiece piece, MCase start, MCase end) {
 		start.setCurPiece(null);
 		end.setCurPiece(piece);
-		piece.moveTo(end.getPosition().x, end.getPosition().z);
+		piece.moveTo(end);
 	}
 
 	public MChessEntity getEntityClicked(Ray ray) {

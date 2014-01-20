@@ -40,7 +40,7 @@ public class ChessModelCreator {
 				ChessModelCreator.getHeight('p'),
 				new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY)),
 				Usage.Position | Usage.Normal);*/
-		pion = loader.loadModel(Gdx.files.internal("pieces/pion.obj"));
+		/*pion = loader.loadModel(Gdx.files.internal("pieces/pion.obj"));
 		pion.materials.add(new Material(ColorAttribute.createDiffuse(Color.WHITE) ));
 		tour = modelBuilder.createBox(ChessModelCreator.getWidth('r'), ChessModelCreator.getDepth('r'),
 				ChessModelCreator.getHeight('r'),
@@ -65,7 +65,7 @@ public class ChessModelCreator {
 		
 		tmp = modelBuilder.createBox(1, 1, 1,
 				new Material(ColorAttribute.createDiffuse(Color.YELLOW)),
-				Usage.Position | Usage.Normal);
+				Usage.Position | Usage.Normal);*/
 	}
 	
 	/**
@@ -214,10 +214,11 @@ public class ChessModelCreator {
 		return new ModelInstance(pion);
 	}
 
-	public static ModelInstance createPiece(char c) {
+	public static ModelInstance createPiece(char c, String skin) {
 		ModelInstance instance = null;
-		
-		switch (c) {
+		Model model = loader.loadModel(Gdx.files.internal(skin+"/"+ String.valueOf(c).toLowerCase() +".obj"));
+		instance = new ModelInstance(model);
+		/*switch (c) {
 		case 'p':
 			instance = new ModelInstance(pion);
 			break;
@@ -254,7 +255,7 @@ public class ChessModelCreator {
 		case 'K':
 			instance = new ModelInstance(roi);
 			break;
-		}
+		}*/
 		return instance;
 	}
 

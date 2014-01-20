@@ -19,10 +19,6 @@ public class ChessGame extends Game {
 	public static TweenManager tween;
 	public static LocalizationManager localize;
 	
-	static{
-		
-	}
-	
 	public SpriteBatch batch;
 	public AssetManager assets;
 	public Network network;
@@ -36,6 +32,7 @@ public class ChessGame extends Game {
 	
 	@Override
 	public void create() {				
+		player = new Player("test");
 		localize = new LocalizationManager();
 		localize.setLanguage(Language.fr);
 		tween = new TweenManager();

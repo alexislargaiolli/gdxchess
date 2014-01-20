@@ -92,18 +92,14 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 
 	public void hightlight(boolean hightlight) {
 		if (hightlight) {
-			((ColorAttribute) instance.materials.get(0).get(
-					ColorAttribute.Diffuse)).color.set(Color.GREEN);
+			((ColorAttribute) instance.materials.get(0).get(ColorAttribute.Diffuse)).color.set(Color.GREEN);
 		} else {
-			((ColorAttribute) instance.materials.get(0).get(
-					ColorAttribute.Diffuse)).color.set(initialColor);
+			((ColorAttribute) instance.materials.get(0).get(ColorAttribute.Diffuse)).color.set(initialColor);
 		}
 	}
 
 	public void moveTo(MCase dest) {
-		move = Tween.to(this, POSITION_XZ, 1f)
-				.target(dest.getPosition().x, dest.getPosition().z)
-				.start(ChessGame.tween);
+		move = Tween.to(this, POSITION_XZ, 0.5f).target(dest.getPosition().x, dest.getPosition().z).start(ChessGame.tween);
 		this.nextCase = dest;
 	}
 
