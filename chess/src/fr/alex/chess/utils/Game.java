@@ -16,7 +16,7 @@ public class Game {
 	
 	public static LocalizationManager localize;
 	
-	public static TweenManager tween;
+	//public static TweenManager tween;
 	
 	public static ScreenManager screens;
 	

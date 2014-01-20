@@ -16,9 +16,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>assets</name>
+			<name>data</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/chess-android/assets</locationURI>
+			<location>/home/jahal/workspace/Chess/gdxchess/chess-desktop/bin/data</location>
 		</link>
 	</linkedResources>
 </projectDescription>

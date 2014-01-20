@@ -1,6 +1,5 @@
 package fr.alex.chess.net;
 
-import fr.alex.chess.utils.Game;
 
 
 public class ClientMSG
@@ -8,9 +7,9 @@ public class ClientMSG
 	ComClient cc;
 	
 	//For Bidirectional Communication mode
-	public ClientMSG()
+	public ClientMSG(ComClient client)
 	{
-		cc = Game.com;
+		cc = client;
 		cc.setClient(this);
 	}
 

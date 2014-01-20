@@ -28,7 +28,7 @@ public class WSClient implements ComClient
 	{
 		this.port = port;
 		connected = false;
-		this.connectClient(ip);
+		//this.connectClient(ip);
 		myID = -1;
 	}
 	

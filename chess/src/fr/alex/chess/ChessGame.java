@@ -1,66 +1,59 @@
 package fr.alex.chess;
 
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import aurelienribon.tweenengine.TweenManager;
 
-public class ChessGame implements ApplicationListener {
-	private OrthographicCamera camera;
-	private SpriteBatch batch;
-	private Texture texture;
-	private Sprite sprite;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+
+import fr.alex.chess.net.ClientProducer;
+import fr.alex.chess.net.Network;
+import fr.alex.chess.screens.MenuScreen;
+import fr.alex.chess.utils.LocalizationManager;
+import fr.alex.chess.utils.LocalizationManager.Language;
+
+public class ChessGame extends Game {
+	
+	public static TweenManager tween;
+	public static LocalizationManager localize;
+	
+	static{
+		
+	}
+	
+	public SpriteBatch batch;
+	public AssetManager assets;
+	public Network network;
+	public Skin skin;
+	public ClientProducer clientProducer;	
+	public String generalServiceUrl;
+	public int generalServicePort;
+	public String gameServiceUrl;
+	public int gameServicePort;
+	public Player player;
 	
 	@Override
-	public void create() {		
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
-		
-		camera = new OrthographicCamera(1, h/w);
-		batch = new SpriteBatch();
-		
-		texture = new Texture(Gdx.files.internal("data/libgdx.png"));
-		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		
-		TextureRegion region = new TextureRegion(texture, 0, 0, 512, 275);
-		
-		sprite = new Sprite(region);
-		sprite.setSize(0.9f, 0.9f * sprite.getHeight() / sprite.getWidth());
-		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
-		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
+	public void create() {				
+		localize = new LocalizationManager();
+		localize.setLanguage(Language.fr);
+		tween = new TweenManager();
+		network = new Network();
+		assets = new AssetManager();
+		skin = new Skin(Gdx.files.internal("uiskin.json"));
+		this.setScreen(new MenuScreen(this));
 	}
 
 	@Override
 	public void dispose() {
-		batch.dispose();
-		texture.dispose();
+		assets.dispose();
 	}
 
 	@Override
 	public void render() {		
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
-		sprite.draw(batch);
-		batch.end();
-	}
-
-	@Override
-	public void resize(int width, int height) {
-	}
-
-	@Override
-	public void pause() {
-	}
-
-	@Override
-	public void resume() {
+		super.render();
+		assets.update();
+		tween.update(Gdx.graphics.getDeltaTime());
 	}
 }

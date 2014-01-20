@@ -18,16 +18,17 @@ public class MChessBoard {
 	protected Array<MPiece> pieces;
 
 	protected MPiece curPiece;
-	
+
 	protected Vector3 center;
 
 	public MChessBoard() {
 		cases = new MCase[64];
 		pieces = new Array<MPiece>();
-		center = new Vector3(BoardSettings.caseSize * 3.5f, 0, BoardSettings.caseSize * 3.5f);
+		center = new Vector3(BoardSettings.caseSize * 3.5f, 0,
+				BoardSettings.caseSize * 3.5f);
 	}
 
-	public void initialize() {		
+	public void initialize() {
 		pieces.clear();
 
 		int col = 0;
@@ -69,7 +70,8 @@ public class MChessBoard {
 					iCase -= number;
 				} catch (Exception ignored) {
 					MCase c = cases[iCase];
-					MPiece piece = new MPiece(p, ChessModelCreator.createPiece(p));
+					MPiece piece = new MPiece(p,
+							ChessModelCreator.createPiece(p));
 					piece.setPosition(c.getPosition().x, c.getPosition().z);
 					pieces.add(piece);
 					c.setCurPiece(piece);
@@ -86,7 +88,7 @@ public class MChessBoard {
 		piece.moveTo(end.getPosition().x, end.getPosition().z);
 	}
 
-	public MChessEntity getCaseClicked(Ray ray) {
+	public MChessEntity getEntityClicked(Ray ray) {
 		MChessEntity selected = null;
 		for (MPiece piece : pieces) {
 			if (piece.isClick(ray) && selected == null) {
@@ -98,6 +100,26 @@ public class MChessBoard {
 				if (c.isClick(ray)) {
 					selected = c;
 				}
+			}
+		}
+		return selected;
+	}
+
+	public MCase getCaseClicked(Ray ray) {
+		MCase selected = null;
+		for (MCase c : cases) {
+			if (c.isClick(ray)) {
+				selected = c;
+			}
+		}
+		return selected;
+	}
+
+	public MPiece getPieceClicked(Ray ray) {
+		MPiece selected = null;
+		for (MPiece piece : pieces) {
+			if (piece.isClick(ray) && selected == null) {
+				selected = piece;
 			}
 		}
 		return selected;
@@ -133,8 +155,8 @@ public class MChessBoard {
 			}
 		}
 	}
-	
-	public Vector3 getCenter(){
+
+	public Vector3 getCenter() {
 		return center;
 	}
 }

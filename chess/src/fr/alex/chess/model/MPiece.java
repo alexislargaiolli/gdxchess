@@ -13,12 +13,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
 
-import fr.alex.chess.utils.Game;
+import fr.alex.chess.ChessGame;
 
-public class MPiece extends MChessEntity implements TweenAccessor<MPiece>{
+public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 
 	public static final int POSITION_XZ = 1;
-	
+
 	protected Vector3 position;
 
 	/**
@@ -34,7 +34,7 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece>{
 	 * Type of the piece r n b q k p
 	 */
 	protected char value;
-	
+
 	/**
 	 * Index in board pieces array
 	 */
@@ -44,32 +44,37 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece>{
 
 	private MCase curCase;
 
+	private MCase nextCase;
+
 	private boolean white;
 
 	private boolean dead;
 
 	private final Color initialColor;
 
+	protected Tween move;
+
 	public MPiece(char p, ModelInstance instance) {
 		super();
 		this.value = p;
 		this.white = "RNBQKP".indexOf(value) >= 0;
-		this.position = new Vector3(0, ChessModelCreator.getDepth(p)*.5f, 0);
+		this.position = new Vector3(0, ChessModelCreator.getDepth(p) * .5f, 0);
 		this.instance = instance;
 		this.boundingBox = new BoundingBox();
 		this.instance.calculateBoundingBox(boundingBox);
 		this.dead = false;
 		this.initialColor = white ? Color.LIGHT_GRAY : Color.DARK_GRAY;
 		hightlight(false);
+		move = null;
 	}
-	
-	public void promote(char p){
-		this.value = p; 
+
+	public void promote(char p) {
+		this.value = p;
 		this.instance = ChessModelCreator.createPiece(p);
-		position.y = ChessModelCreator.getDepth(p)*.5f;
+		position.y = ChessModelCreator.getDepth(p) * .5f;
 		instance.transform.setToTranslation(position.x, position.y, position.z);
 		this.hightlight(false);
-		//setPosition(position.x, position.y);
+		// setPosition(position.x, position.y);
 	}
 
 	public void setPosition(float x, float z) {
@@ -80,7 +85,7 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece>{
 	}
 
 	public boolean isClick(Ray ray) {
-		if(dead)
+		if (dead)
 			return false;
 		return Intersector.intersectRayBounds(ray, boundingBox, null);
 	}
@@ -95,15 +100,27 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece>{
 		}
 	}
 
-	public void moveTo(float x, float z) {
-		Tween.to(this, POSITION_XZ, 1f).target(x, z).start(Game.tween);		
+	public void moveTo(MCase dest) {
+		move = Tween.to(this, POSITION_XZ, 1f)
+				.target(dest.getPosition().x, dest.getPosition().z)
+				.start(ChessGame.tween);
+		this.nextCase = dest;
 	}
 
 	public void update(float delta) {
-		
+		if (move != null) {
+			if (move.isFinished()) {
+				move = null;
+				if (curCase.getCurPiece().equals(this)) {
+					curCase.setCurPiece(null);
+				}
+				curCase = nextCase;
+				curCase.setCurPiece(this);
+			}
+		}
 	}
-	
-	private void updateBoundingBox(float x, float z){
+
+	private void updateBoundingBox(float x, float z) {
 		Vector3 min = boundingBox.min;
 		min.x = x - ChessModelCreator.getWidth(value) * .5f;
 		min.y = position.y - ChessModelCreator.getHeight(value) * .5f;
@@ -112,7 +129,7 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece>{
 		max.x = x + ChessModelCreator.getWidth(value) * .5f;
 		max.y = position.y + ChessModelCreator.getHeight(value) * .5f;
 		max.z = z + ChessModelCreator.getDepth(value) * .5f;
-		boundingBox.set(min, max);		
+		boundingBox.set(min, max);
 	}
 
 	public void draw(ModelBatch modelBatch, Environment environment) {

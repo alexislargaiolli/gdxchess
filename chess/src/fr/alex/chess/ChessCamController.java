@@ -14,9 +14,13 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
-import fr.alex.chess.utils.Game;
+import fr.alex.chess.screens.ChessGameScreen;
 
 public class ChessCamController extends GestureDetector implements TweenAccessor<ChessCamController> {
+
+	public State getState() {
+		return state;
+	}
 
 	public static enum State {
 		IDLE, ROTATE_LEFT, ROTATE_RIGHT, ZOOM, ROTATE_AROUND, CINEMATIC_BEGIN
@@ -42,17 +46,21 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 	protected float lookAtX=0, lookAtY=0, lookAtZ=0;
 	protected float zoom = 1;
 	protected boolean zoomed;
-
-	protected ChessCamController(final CameraGestureListener gestureListener, final Camera camera) {
+	protected ChessGame game;
+	protected ChessGameScreen gameScreen;
+	
+	protected ChessCamController(ChessGameScreen gameScreen, final ChessGame game, final CameraGestureListener gestureListener, final Camera camera) {
 		super(gestureListener);
+		this.gameScreen = gameScreen;
+		this.game = game;
 		this.gestureListener = gestureListener;
 		this.gestureListener.controller = this;
 		this.camera = camera;
 		this.tmpV1 = new Vector3();
 	}
 
-	public ChessCamController(Camera camera) {
-		this(new CameraGestureListener(), camera);
+	public ChessCamController(ChessGameScreen gameScreen, final ChessGame game, Camera camera) {
+		this(gameScreen, game, new CameraGestureListener(), camera);
 		state = State.IDLE;
 		left = new Vector3(20, 15, 10);
 		focus = new Vector3();
@@ -101,13 +109,17 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 		}
 	}
 
+	public ChessGameScreen getGameScreen() {
+		return gameScreen;
+	}
+
 	public void startCinematicBlackBegin() {
 		camera.rotate(Vector3.Y, 180);
 		camera.position.set(focus.x, 60f, focus.z);
 		camera.lookAt(focus.x, 0f, focus.z);
 		if (state == State.IDLE) {
-			Tween.to(this, ANGLE_X, 2f).target(45f).ease(Cubic.OUT).start(Game.tween);
-			Tween.to(this, ZOOM, 3f).target(20f).ease(Cubic.OUT).start(Game.tween).setCallback(new TweenCallback() {
+			Tween.to(this, ANGLE_X, 1f).target(45f).ease(Cubic.OUT).start(game.tween);
+			Tween.to(this, ZOOM, 2f).target(20f).ease(Cubic.OUT).start(game.tween).setCallback(new TweenCallback() {
 				@Override
 				public void onEvent(int type, BaseTween<?> source) {
 					switchState(State.IDLE);
@@ -122,8 +134,8 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 		camera.position.set(focus.x, 60f, focus.z);
 		camera.lookAt(focus.x, 0f, focus.z);
 		if (state == State.IDLE) {
-			Tween.to(this, ANGLE_X, 2f).target(-45f).ease(Cubic.OUT).start(Game.tween);
-			Tween.to(this, ZOOM, 3f).target(20f).ease(Cubic.OUT).start(Game.tween).setCallback(new TweenCallback() {
+			Tween.to(this, ANGLE_X, 1f).target(-45f).ease(Cubic.OUT).start(game.tween);
+			Tween.to(this, ZOOM, 2f).target(20f).ease(Cubic.OUT).start(game.tween).setCallback(new TweenCallback() {
 				@Override
 				public void onEvent(int type, BaseTween<?> source) {
 					switchState(State.IDLE);
@@ -136,11 +148,11 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 	public void startEndCinematic(Vector3 target){
 		if (state == State.IDLE) {
 			
-			Tween.to(this, LOOKAT, 2).target(target.x, target.y, target.z).start(Game.tween);
+			Tween.to(this, LOOKAT, 2).target(target.x, target.y, target.z).start(game.tween);
 			//Tween.to(this, POS_XYZ, 2).target(target.x, camera.position.y, target.z).start(Game.tween);
 			//Tween.to(this, ANGLE_X, 2f).target(45f).delay(2f).ease(Cubic.OUT).start(Game.tween);
-			Tween.to(this, ZOOM, 6f).target(30f).ease(Linear.INOUT).start(Game.tween);
-			Tween.to(this, ANGLE_Y, 15f).delay(2f).target(360).ease(Linear.INOUT).repeat(800, 0).start(Game.tween);
+			Tween.to(this, ZOOM, 6f).target(30f).ease(Linear.INOUT).start(game.tween);
+			Tween.to(this, ANGLE_Y, 15f).delay(2f).target(360).ease(Linear.INOUT).repeat(800, 0).start(game.tween);
 			
 			/*camera.lookAt(target.x, target.y, target.z);
 			
@@ -151,8 +163,8 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 	
 	private void rotateAround() {
 		if (state == State.IDLE) {
-			Tween.to(this, ZOOM, 3).target(35f).start(Game.tween);
-			Tween.to(this, ANGLE_Y, 8).target(360).ease(Linear.INOUT).repeat(800, 0).start(Game.tween).setCallback(new TweenCallback() {
+			Tween.to(this, ZOOM, 3).target(35f).start(game.tween);
+			Tween.to(this, ANGLE_Y, 8).target(360).ease(Linear.INOUT).repeat(800, 0).start(game.tween).setCallback(new TweenCallback() {
 				@Override
 				public void onEvent(int type, BaseTween<?> source) {
 					switchState(State.IDLE);
@@ -173,7 +185,7 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 
 	private void zoomIn() {
 		if (state == State.IDLE) {
-			Tween.to(this, ZOOM, 1).target(10f).ease(Back.OUT).start(Game.tween).setCallback(new TweenCallback() {
+			Tween.to(this, ZOOM, 1).target(10f).ease(Back.OUT).start(game.tween).setCallback(new TweenCallback() {
 				@Override
 				public void onEvent(int type, BaseTween<?> source) {
 					switchState(State.IDLE);
@@ -186,7 +198,7 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 
 	private void zoomOut() {
 		if (state == State.IDLE) {
-			Tween.to(this, ZOOM, 1).target(1f).ease(Back.OUT).start(Game.tween).setCallback(new TweenCallback() {
+			Tween.to(this, ZOOM, 1).target(1f).ease(Back.OUT).start(game.tween).setCallback(new TweenCallback() {
 				@Override
 				public void onEvent(int type, BaseTween<?> source) {
 					switchState(State.IDLE);
@@ -199,7 +211,7 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 
 	private void rotateLeft() {
 		if (state == State.IDLE) {
-			Tween.to(this, ANGLE_Y, 1).target(-90).start(Game.tween).setCallback(new TweenCallback() {
+			Tween.to(this, ANGLE_Y, 1).target(-90).start(game.tween).setCallback(new TweenCallback() {
 				@Override
 				public void onEvent(int type, BaseTween<?> source) {
 					switchState(State.IDLE);
@@ -211,7 +223,7 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 
 	private void rotateRight() {
 		if (state == State.IDLE) {
-			Tween.to(this, ANGLE_Y, 1).target(90).start(Game.tween).setCallback(new TweenCallback() {
+			Tween.to(this, ANGLE_Y, 1).target(90).start(game.tween).setCallback(new TweenCallback() {
 				@Override
 				public void onEvent(int type, BaseTween<?> source) {
 					switchState(State.IDLE);
@@ -315,6 +327,9 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 
 		@Override
 		public boolean tap(float x, float y, int count, int button) {
+			if(count == 1){
+				controller.getGameScreen().handleClick(x, y);
+			}
 			if (count == 2) { //Double tap
 				controller.toggleZoom();
 			}
