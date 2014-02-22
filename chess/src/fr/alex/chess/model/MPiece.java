@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
 
 import fr.alex.chess.ChessGame;
+import fr.alex.chess.Player;
 
 public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 
@@ -51,12 +52,15 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 	private boolean dead;
 
 	private final Color initialColor;
+	
+	private Player player;
 
 	protected Tween move;
 
-	public MPiece(char p, ModelInstance instance) {
+	public MPiece(char p, ModelInstance instance, Player player) {
 		super();
 		this.value = p;
+		this.player = player;
 		this.white = "RNBQKP".indexOf(value) >= 0;
 		this.position = new Vector3(0, ChessModelCreator.getDepth(p) * .5f, 0);
 		this.instance = instance;
@@ -70,7 +74,7 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 
 	public void promote(char p) {
 		this.value = p;
-		this.instance = ChessModelCreator.createPiece(p);
+		this.instance = ChessModelCreator.createPiece(p, player.getSkin());
 		position.y = ChessModelCreator.getDepth(p) * .5f;
 		instance.transform.setToTranslation(position.x, position.y, position.z);
 		this.hightlight(false);

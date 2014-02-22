@@ -82,7 +82,7 @@ public class ChessGameScreen implements Screen {
 
 		board = new Board();
 		board.startPosition();
-		chessBoard.initFromEngine(board, gameInstance.getSettings().getWhite().getSkin(), gameInstance.getSettings().getBlack().getSkin());
+		chessBoard.initFromEngine(board, gameInstance.getSettings().getWhite(), gameInstance.getSettings().getBlack());
 
 		cam.position.set(chessBoard.getCenter().x, 40f, chessBoard.getCenter().z * .5f);
 		cam.update();

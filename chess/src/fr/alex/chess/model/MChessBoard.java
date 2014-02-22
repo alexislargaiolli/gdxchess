@@ -3,10 +3,13 @@ package fr.alex.chess.model;
 import com.alonsoruibal.chess.Board;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
+
+import fr.alex.chess.Player;
 
 public class MChessBoard {
 
@@ -56,7 +59,7 @@ public class MChessBoard {
 		}
 	}
 
-	public void initFromEngine(Board board, String whiteSkin, String blackSkin) {
+	public void initFromEngine(Board board, Player white, Player black) {
 		String fen = board.getFen();
 		int i = 0;
 		int iCase = 63;
@@ -69,7 +72,9 @@ public class MChessBoard {
 					iCase -= number;
 				} catch (Exception ignored) {
 					MCase c = cases[iCase];
-					MPiece piece = new MPiece(p, ChessModelCreator.createPiece(p, isWhite(p) ? whiteSkin : blackSkin));
+					Player player = isWhite(p) ? white : black;
+					ModelInstance model = ChessModelCreator.createPiece(p, player.getSkin());
+					MPiece piece = new MPiece(p, model, player);
 					piece.setPosition(c.getPosition().x, c.getPosition().z);
 					pieces.add(piece);
 					c.setCurPiece(piece);
