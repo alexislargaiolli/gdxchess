@@ -53,12 +53,15 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 	private final Color initialColor;
 
 	protected Tween move;
+	
+	protected String skin;
 
-	public MPiece(char p, ModelInstance instance) {
+	public MPiece(char p, ModelInstance instance, String skin) {
 		super();
+		this.skin = skin;
 		this.value = p;
 		this.white = "RNBQKP".indexOf(value) >= 0;
-		this.position = new Vector3(0, ChessModelCreator.getDepth(p) * .5f, 0);
+		this.position = new Vector3(0, 0, 0);
 		this.instance = instance;
 		this.boundingBox = new BoundingBox();
 		this.instance.calculateBoundingBox(boundingBox);
@@ -70,7 +73,7 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 
 	public void promote(char p) {
 		this.value = p;
-		this.instance = ChessModelCreator.createPiece(p);
+		this.instance = ChessModelCreator.createPiece(p, skin);
 		position.y = ChessModelCreator.getDepth(p) * .5f;
 		instance.transform.setToTranslation(position.x, position.y, position.z);
 		this.hightlight(false);

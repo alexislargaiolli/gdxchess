@@ -43,7 +43,7 @@ public class MChessBoard {
 
 			float x = col * BoardSettings.caseSize;
 			float z = row * BoardSettings.caseSize;
-			MCase c = new MCase(new Vector3(x, 0, z), color);
+			MCase c = new MCase(new Vector3(x, -1f, z), color);
 			c.setiCol(col);
 			c.setiRow(row);
 			c.setIndex(i);
@@ -69,7 +69,8 @@ public class MChessBoard {
 					iCase -= number;
 				} catch (Exception ignored) {
 					MCase c = cases[iCase];
-					MPiece piece = new MPiece(p, ChessModelCreator.createPiece(p, isWhite(p) ? whiteSkin : blackSkin));
+					String skin = isWhite(p) ? whiteSkin : blackSkin;
+					MPiece piece = new MPiece(p, ChessModelCreator.createPiece(p, skin), skin);
 					piece.setPosition(c.getPosition().x, c.getPosition().z);
 					pieces.add(piece);
 					c.setCurPiece(piece);
