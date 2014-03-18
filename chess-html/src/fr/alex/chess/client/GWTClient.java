@@ -7,16 +7,12 @@ import net.zschech.gwt.websockets.client.MessageEvent;
 import net.zschech.gwt.websockets.client.MessageHandler;
 import net.zschech.gwt.websockets.client.OpenHandler;
 import net.zschech.gwt.websockets.client.WebSocket;
-import sun.org.mozilla.javascript.internal.JavaScriptException;
 
 public class GWTClient implements ComClient {
 	// private static int DEFAULT_SERVER_PORT = 80;
 	private int port;
 	private WebSocket wsc; // Websocket to connect to a remote server
 	private boolean connected;
-
-	// For the Client side only
-	private int myID;
 	private fr.alex.chess.net.ClientMSG c;
 
 	// For Bidirectional Communication mode
@@ -24,7 +20,6 @@ public class GWTClient implements ComClient {
 		this.port = port;
 		this.connected = false;
 		this.connectClient(ip);
-		myID = -1;
 	}
 
 	public void connectClient(String ip) {
@@ -44,7 +39,6 @@ public class GWTClient implements ComClient {
 					@Override
 					public void onOpen(WebSocket webSocket) {
 						connected = true;
-						requestID();
 					}
 				});
 
@@ -52,29 +46,8 @@ public class GWTClient implements ComClient {
 					@Override
 					public void onMessage(WebSocket webSocket,
 							MessageEvent event) {
-						String message = event.getData(); // Different
-															// implementation
-															// respect WSClient
-
-						// Low level control of Messages received from server
-						// SERVER CLOSES MY WS CONNECTION.
-						if (message.equals("MSG_CLOSE_WS")) {
-							wsc.close();
-						}
-
-						// SERVER SEND MY CLIENT ID.
-						else if (message.startsWith("MSG_SEND_ID")) {
-							String[] values = message.split("\\s+"); // splitter
-																		// with
-																		// the
-																		// " "
-																		// separator
-							myID = Integer.valueOf(values[1]);
-						}
-						// High level Message, send to the ClientMSG class
-						else {
-							c.onMessage(message);
-						}
+						String message = event.getData();
+						c.onMessage(message);
 					}
 				});
 
@@ -91,13 +64,9 @@ public class GWTClient implements ComClient {
 						connected = false;
 					}
 				});
-			} catch (JavaScriptException e) {
+			} catch (Exception e) {
 			}
 		}
-	}
-
-	private void requestID() {
-		sendMsg("MSG_REQUEST_ID");
 	}
 
 	public boolean sendMsg(String msg) {
@@ -112,17 +81,19 @@ public class GWTClient implements ComClient {
 		return connected;
 	}
 
-	public int getId() {
-		return myID;
-	}
-
 	public void close() {
 		wsc.close();
 		connected = false;
 	}
-	
+
 	@Override
 	public void setClient(fr.alex.chess.net.ClientMSG client) {
 		this.c = client;
+	}
+
+	@Override
+	public int getId() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

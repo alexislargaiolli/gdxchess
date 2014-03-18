@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
 
+import fr.alex.chess.ChessGame;
+
 /**
  * 3D representation of a chess board case
  * @author Jahal
@@ -41,13 +43,11 @@ public class MCase extends MChessEntity {
 	private Vector3 position;
 	
 	private BoundingBox boundingBox;
-
-	private MPiece curPiece;
 	
 	public MCase(Vector3 position, boolean white) {
 		this.position = position;
 		this.white = white;
-		instance = white ? ChessModelCreator.createWidthCase() : ChessModelCreator.createBlackCase();
+		instance = white ? ChessGame.model.createWidthCase() : ChessGame.model.createBlackCase();
 		instance.transform.setToTranslation(position.x, position.y, position.z);
 		boundingBox = new BoundingBox();		
 		instance.calculateBoundingBox(boundingBox);
@@ -134,13 +134,5 @@ public class MCase extends MChessEntity {
 
 	public void setIndex(int index) {
 		this.index = index;
-	}
-
-	public MPiece getCurPiece() {
-		return curPiece;
-	}
-
-	public void setCurPiece(MPiece curPiece) {
-		this.curPiece = curPiece;
 	}
 }

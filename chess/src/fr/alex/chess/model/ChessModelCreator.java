@@ -11,22 +11,19 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 
+import fr.alex.chess.ChessGame;
+
 public class ChessModelCreator {
 
-	private static ModelBuilder modelBuilder;
+	private ModelBuilder modelBuilder;
 	@SuppressWarnings("rawtypes")
-	private static ModelLoader loader;
-	private static Model whiteCase;
-	private static Model blackCase;
-	private static Model pion;
-	private static Model tour;
-	private static Model cavalier;
-	private static Model fou;
-	private static Model roi;
-	private static Model dame;
-	private static Model tmp;
+	private ModelLoader loader;
+	private Model whiteCase;
+	private Model blackCase;
+	private ChessGame game;
 
-	static {
+	public ChessModelCreator(ChessGame game) {
+		this.game = game;
 		modelBuilder = new ModelBuilder();
 		loader = new ObjLoader();
 		whiteCase = modelBuilder.createBox(BoardSettings.caseSize, 1f,
@@ -35,37 +32,16 @@ public class ChessModelCreator {
 		blackCase = modelBuilder.createBox(BoardSettings.caseSize, 1f,
 				BoardSettings.caseSize,
 				new Material(ColorAttribute.createDiffuse(Color.BLACK)),
-				Usage.Position | Usage.Normal);
-		/*pion = modelBuilder.createBox(ChessModelCreator.getWidth('p') , ChessModelCreator.getDepth('p'),
-				ChessModelCreator.getHeight('p'),
-				new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY)),
-				Usage.Position | Usage.Normal);*/
-		/*pion = loader.loadModel(Gdx.files.internal("pieces/pion.obj"));
-		pion.materials.add(new Material(ColorAttribute.createDiffuse(Color.WHITE) ));
-		tour = modelBuilder.createBox(ChessModelCreator.getWidth('r'), ChessModelCreator.getDepth('r'),
-				ChessModelCreator.getHeight('r'),
-				new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)),
-				Usage.Position | Usage.Normal);
-		cavalier = modelBuilder.createBox(ChessModelCreator.getWidth('n'), ChessModelCreator.getDepth('n'),
-				ChessModelCreator.getHeight('n'),
-				new Material(ColorAttribute.createDiffuse(Color.BLUE)),
-				Usage.Position | Usage.Normal);
-		fou = modelBuilder.createBox(ChessModelCreator.getWidth('b'), ChessModelCreator.getDepth('b'),
-				ChessModelCreator.getHeight('b'),
-				new Material(ColorAttribute.createDiffuse(Color.BLUE)),
-				Usage.Position | Usage.Normal);
-		roi = modelBuilder.createBox(ChessModelCreator.getWidth('k'), ChessModelCreator.getDepth('k'),
-				ChessModelCreator.getHeight('k'),
-				new Material(ColorAttribute.createDiffuse(Color.RED)),
-				Usage.Position | Usage.Normal);
-		dame = modelBuilder.createBox(ChessModelCreator.getWidth('q'), ChessModelCreator.getDepth('q'),
-				ChessModelCreator.getHeight('q'),
-				new Material(ColorAttribute.createDiffuse(Color.YELLOW)),
-				Usage.Position | Usage.Normal);
-		
-		tmp = modelBuilder.createBox(1, 1, 1,
-				new Material(ColorAttribute.createDiffuse(Color.YELLOW)),
-				Usage.Position | Usage.Normal);*/
+				Usage.Position | Usage.Normal);		
+	}
+	
+	public void load(String skin){
+		this.game.assets.load(skin+"/k.g3db", Model.class);
+		this.game.assets.load(skin+"/n.g3db", Model.class);
+		this.game.assets.load(skin+"/p.g3db", Model.class);
+		this.game.assets.load(skin+"/q.g3db", Model.class);
+		this.game.assets.load(skin+"/r.g3db", Model.class);
+		this.game.assets.load(skin+"/b.g3db", Model.class);
 	}
 	
 	/**
@@ -73,7 +49,7 @@ public class ChessModelCreator {
 	 * @param p
 	 * @return the width of the specified piece
 	 */
-	public static float getWidth(char p){
+	public float getWidth(char p){
 		float width = 0;
 		switch (p) {
 		case 'p':
@@ -116,7 +92,7 @@ public class ChessModelCreator {
 		return width;
 	}
 	
-	public static float getHeight(char p){
+	public float getHeight(char p){
 		float height = 0;
 		switch (p) {
 		case 'p':
@@ -159,7 +135,7 @@ public class ChessModelCreator {
 		return height;
 	}
 	
-	public static float getDepth(char p){
+	public float getDepth(char p){
 		float depth = 0;
 		switch (p) {
 		case 'p':
@@ -202,65 +178,19 @@ public class ChessModelCreator {
 		return depth;
 	}
 
-	public static ModelInstance createWidthCase() {
+	public ModelInstance createWidthCase() {
 		return new ModelInstance(whiteCase);
 	}
 
-	public static ModelInstance createBlackCase() {
+	public ModelInstance createBlackCase() {
 		return new ModelInstance(blackCase);
 	}
 
-	public static ModelInstance createPion() {
-		return new ModelInstance(pion);
-	}
-
-	public static ModelInstance createPiece(char c, String skin) {
-		ModelInstance instance = null;
+	public ModelInstance createPiece(char c, String skin) {
+		String fileName = skin+"/"+ String.valueOf(c).toLowerCase() +".g3db";
+		this.game.assets.get(fileName, Model.class);
 		Model model = loader.loadModel(Gdx.files.internal(skin+"/"+ String.valueOf(c).toLowerCase() +".obj"));
-		instance = new ModelInstance(model);
-		/*switch (c) {
-		case 'p':
-			instance = new ModelInstance(pion);
-			break;
-		case 'r':
-			instance = new ModelInstance(tour);
-			break;
-		case 'n':
-			instance = new ModelInstance(cavalier);
-			break;
-		case 'b':
-			instance = new ModelInstance(fou);
-			break;
-		case 'q':
-			instance = new ModelInstance(dame);
-			break;
-		case 'k':
-			instance = new ModelInstance(roi);
-			break;
-		case 'P':
-			instance = new ModelInstance(pion);
-			break;
-		case 'R':
-			instance = new ModelInstance(tour);
-			break;
-		case 'N':
-			instance = new ModelInstance(cavalier);
-			break;
-		case 'B':
-			instance = new ModelInstance(fou);
-			break;
-		case 'Q':
-			instance = new ModelInstance(dame);
-			break;
-		case 'K':
-			instance = new ModelInstance(roi);
-			break;
-		}*/
+		ModelInstance instance = new ModelInstance(model);
 		return instance;
 	}
-
-	public static ModelInstance createTmp() {
-		return new ModelInstance(tmp);
-	}
-
 }

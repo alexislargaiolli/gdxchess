@@ -5,8 +5,19 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="libs/gdx-backend-gwt-sources.jar"/>
 	<classpathentry kind="lib" path="libs/gdx-backend-gwt.jar"/>
-	<classpathentry kind="lib" path="libs/gwt-servlet.jar"/>
 	<classpathentry kind="lib" path="libs/gwt-web-sockets-1.0.0.jar" sourcepath="/chess/libs/gwt-web-sockets-1.0.0.jar"/>
-	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT"/>
+	<classpathentry kind="lib" path="/home/jahal/Dev/gwt-2.6.0/gwt-user.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/jahal/Dev/gwt-2.6.0/doc/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/jahal/Dev/gwt-2.6.0/gwt-dev.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/jahal/Dev/gwt-2.6.0/doc/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/jahal/Dev/gwt-2.6.0/validation-api-1.0.0.GA.jar" sourcepath="/home/jahal/Dev/gwt-2.6.0/validation-api-1.0.0.GA-sources.jar"/>
+	<classpathentry kind="lib" path="/home/jahal/Dev/gwt-2.6.0/validation-api-1.0.0.GA-sources.jar"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/gwt-2.6.0"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

@@ -1,154 +1,177 @@
 package fr.alex.chess.net;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net.HttpRequest;
+import com.badlogic.gdx.Net.HttpResponse;
+import com.badlogic.gdx.Net.HttpResponseListener;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 
-import fr.alex.chess.player.GameInfo;
-import fr.alex.chess.screens.GameScreen;
-import fr.alex.chess.utils.Game;
+import fr.alex.chess.ChessGame;
+import fr.alex.chess.GameInstanceSettings;
+import fr.alex.chess.Player;
+import fr.alex.chess.net.request.AuthReponse;
+import fr.alex.chess.net.request.MoveRequest;
 
 public class Net {
-	public static boolean enable = true;
-	private static boolean gameIdReceived;
-	private static String[] gameids;
-	private static boolean gameListReceived;
-	private static boolean gameListAsked;
-	private static boolean gameIdAsked;
-	private static ClientMSG client;
-	private static GameScreen game;
-	
-	public static void connectGame(GameScreen game) {
-		Net.game = game;
-		if (enable) {
-			try {
-				connectToGame();
-				game.connectionEtablished();
-			} catch (GdxRuntimeException gdxEx) {
-				gdxEx.printStackTrace();
-			}
-		}
+	private ClientMSG client;
+	private ChessGame game;
+	private String url;
+	private boolean error;
+	private boolean synchronizationOver;
+	private List<MoveRequest> moveReceived;
+
+	public Net(ChessGame game) {
+		this.game = game;
+		this.synchronizationOver = false;
+		moveReceived = new ArrayList<MoveRequest>();
+		this.url = game.gameServiceUrl + ":" + game.gameServicePort;
 	}
 
-	public static void connect() {
-		if (enable) {
-			try {
-				gameIdReceived = false;
-				gameListReceived = false;
-				client = new ClientMSG();
-			} catch (GdxRuntimeException gdxEx) {
-				gdxEx.printStackTrace();
-			}
-		} else {
-
-		}
+	public void connect(String gameId) {
+		Gdx.app.log("Net", "connect()");
+		this.client = new ClientMSG(game.clientProducer.produceClient(game.gameServiceUrl, game.gameServicePort), game);
+		this.client.connect();
 	}
-	
-	public static void disconnect(){
-		if(enable && client != null && client.isConnected()){
+
+	public void disconnect() {
+		if (client != null && client.isConnected()) {
 			client.close();
 		}
 	}
 
-	public static boolean isConnected() {
-		return client != null ? client.isConnected() : false;
-	}	
-	
-	public static void onMessage(String message){
-		String messageType = message.substring(0, 1);
-		message = message.substring(1, message.length());
-		System.out.println("Net: receive " + message);
-		if (messageType.equals("?")) { // Server requests info
-			if(message.equals("name")){
-				Net.sendToHallSocket("#name:"+Game.player.getName());
-			}
-		} else if (messageType.equals("#")) { // Server pushes info
-			if (message.startsWith("games")) {
-				gameids = message.substring(message.indexOf(":") + 1, message.length()).split(";");							
-				gameListAsked = false;
-				gameListReceived = true;
-			} else if (message.startsWith("gameid")) {							
-				GameInfo.gameid = message.substring(message.indexOf(":") + 1, message.length());
-				gameIdReceived = true;
-				gameIdAsked = false;
-			}
-			else if(message.equals("empty")){
-				gameListAsked = false;
-				gameListReceived = true;
-				gameids = null;
-			}
-			else if (message.equals("white")) {
-				Game.player.setWhite(true);
-			} else if (message.equals("black")) {
-				Game.player.setWhite(false);
-			} else if (message.equals("yourturn")) {
-				
-			} else if (message.equals("opponentTurn")) {
+	public boolean isConnected() {
+		if (client == null)
+			return false;
+		if (!client.isConnected())
+			return false;
 
-			} else if (message.equals("waitingopponent")) {
-				
-			} else if (message.equals("opponentFound")) {
-				game.opponentFound();
-			} else if (message.startsWith("move")) {				
-				String lastMove = message.substring(message.indexOf(":") + 1, message.length());
-				game.opponentMoved(lastMove);
-			}
-			else if(message.equals("opponentHasLeft")){				
-				game.opponentLeft();				
-			}
-		}
-	}
-	
-	public static void connectToGame(){
-		Net.sendToHallSocket("#connect:"+GameInfo.gameid);
-		System.out.println("Net: connect");
-	}
-	
-	public static void askGameList() throws IOException {
-		gameListReceived = false;
-		gameListAsked = true;
-		sendToHallSocket("?games");
+		return game.instance.isReady();
 	}
 
-	public static void askGameId() throws IOException {
-		gameIdReceived = false;
-		gameIdAsked = true;
-		sendToHallSocket("?create");
-	}
+	public void onMessage(String message) {
+		Gdx.app.log("Net", "message(): " + message);
+		JsonReader reader = new JsonReader();
+		JsonValue json = reader.parse(message);
+		String type = json.get("type").asString();
+		if (type.equals("auth")) {
+			handleAuth();
+		} else if (type.equals("synch")) {
 
-	public static void sendToHallSocket(String message) {	
-		if (enable && client != null) {			
-			client.sendMessage(message);
-			System.out.println("Data sent: " + message);
+		} else if (type.equals("auth-response")) {
+			handleAuthReponse(json);
+		} else if (type.equals("move")) {
+			handleMove(json);
 		}
 	}
 
-	public static void sendMove(int start, int end) throws IOException {
-		sendToHallSocket("#move:" + start + ";" + end);
+	private void handleAuth() {
+		AuthReponse response = new AuthReponse(game.instance.getGameId(), game.instance.getPlayerId());
+		client.sendMessage(response.toJSON());
 	}
 
-	public static void sendPromoteMove(int start, int end, char promoteChoice) throws IOException {
-		sendToHallSocket("#move:" + start + ";" + end + ";" + promoteChoice);
-	}
-	
-	public static String[] getGameids() {
-		return gameids;
-	}
-
-	public static boolean isGameIdReceived() {
-		return gameIdReceived;
-	}
-
-	public static boolean isGameListReceived() {
-		return gameListReceived;
+	private void handleAuthReponse(JsonValue json) {
+		if (json.getInt("auth") == 1) {
+			String opponentId = json.getString("opponent");
+			String creatorId = json.getString("creator");
+			game.instance.setBlack(new Player(opponentId));
+			game.instance.setWhite(new Player(creatorId));
+			game.instance.setSettings(new GameInstanceSettings());
+		} else {
+			error = true;
+		}
 	}
 
-	public static boolean isGameListAsking() {
-		return gameListAsked;
+	public void handleMove(JsonValue json) {
+		MoveRequest move = new MoveRequest(json.getInt("index"), json.getInt("start"), json.getInt("end"), json.getString("promote"), json.getString("gameId"), json.getString("playerId"));
+		moveReceived.add(move);
 	}
 
-	public static boolean isGameIdAsked() {
-		return gameIdAsked;
+	public void sendMove(MoveRequest move) {		
+		client.sendMessage(move.toJSON());
+	}
+
+	public void synchronize() {
+		Gdx.app.log("Net", "synchronize()");
+		String url = "http://" + game.gameServiceUrl + ":" + game.gameServicePort + "/game/moves/" + game.instance.getGameId();
+		Gdx.app.log("synchronize", url);
+		HttpRequest request = new HttpRequest("GET");
+		request.setUrl(url);
+		Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+
+			@Override
+			public void handleHttpResponse(HttpResponse httpResponse) {
+
+				JsonReader reader = new JsonReader();
+				String response = httpResponse.getResultAsString();
+				JsonValue json = reader.parse(response);
+
+				Iterator<JsonValue> it = json.iterator();
+				while (it.hasNext()) {
+					JsonValue child = it.next();
+					int index = child.getInt("index");
+					int start = child.getInt("start");
+					int end = child.getInt("end");
+					String promote = child.getString("promote");
+					String gameId = child.getString("game");
+					String playerId = child.getString("player");
+					MoveRequest move = new MoveRequest(index, start, end, promote, gameId, playerId);
+					moveReceived.add(move);
+				}
+				synchronizationOver = true;
+			}
+
+			@Override
+			public void failed(Throwable t) {
+				synchronizationOver = false;
+				t.printStackTrace();
+				Gdx.app.log("synchronize()", "error : " + t.getMessage());
+			}
+		});
+	}
+
+	public boolean hasReceivedMove() {
+		return moveReceived.size() > 0;
+	}
+
+	public MoveRequest getReceivedMove() {
+		return moveReceived.get(0);
+	}
+
+	public void clearMove() {
+		moveReceived.clear();
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public boolean isError() {
+		return error;
+	}
+
+	public boolean isSynchronizationOver() {
+		return synchronizationOver;
+	}
+
+	public void setSynchronizationOver(boolean synchronizationOver) {
+		this.synchronizationOver = synchronizationOver;
+	}
+
+	public List<MoveRequest> getMoveReceived() {
+		return moveReceived;
+	}
+
+	public void setMoveReceived(List<MoveRequest> moveReceived) {
+		this.moveReceived = moveReceived;
 	}
 
 }

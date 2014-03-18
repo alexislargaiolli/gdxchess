@@ -3,7 +3,8 @@
 <module>
 	<inherits name='com.badlogic.gdx.backends.gdx_backends_gwt' />
 	<inherits name='aurelienribon.tweenengine' />
+	<inherits name='net.zschech.gwt.websockets.WebSockets' />	
 	<inherits name='ChessGame' />
 	<entry-point class='fr.alex.chess.client.GwtLauncher' />
-	<set-configuration-property name="gdx.assetpath" value="../chess-android/assets" />
+	<set-configuration-property name="gdx.assetpath" value="../chess-desktop/assets" />
 </module>

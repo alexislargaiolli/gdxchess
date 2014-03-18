@@ -2,23 +2,27 @@ package fr.alex.chess;
 
 public class GameInstance {
 	protected String gameId;
-	protected String gameName;
-	protected Player player1;
-	protected Player player2;
+	protected String playerId;
+	protected Player white;
+	protected Player black;
 	protected GameInstanceSettings settings;
 	
+	public GameInstance(String gameId, String playerId) {
+		this.gameId = gameId;
+		this.playerId = playerId;
+	}
+	
+	public boolean isReady(){
+		return gameId != null && playerId != null && white != null && black != null && settings != null;
+	}
+
 	public GameInstanceSettings getSettings() {
 		return settings;
 	}
 
 	public void setSettings(GameInstanceSettings settings) {
 		this.settings = settings;
-	}
-
-	public GameInstance(String name) {
-		super();
-		this.gameName = name;
-	}
+	}	
 
 	public String getGameId() {
 		return gameId;
@@ -27,28 +31,28 @@ public class GameInstance {
 	public void setGameId(String gameId) {
 		this.gameId = gameId;
 	}
-
-	public String getGameName() {
-		return gameName;
-	}
-
-	public void setGameName(String gameName) {
-		this.gameName = gameName;
-	}
-
-	public Player getPlayer1() {
-		return player1;
-	}
-
-	public void setPlayer1(Player player1) {
-		this.player1 = player1;
-	}
-
-	public Player getPlayer2() {
-		return player2;
-	}
-
-	public void setPlayer2(Player player2) {
-		this.player2 = player2;
+	
+	public Player getWhite() {
+		return white;
 	}	
+	
+	public void setWhite(Player white) {
+		this.white = white;
+	}
+
+	public Player getBlack() {
+		return black;
+	}
+
+	public void setBlack(Player black) {
+		this.black = black;
+	}
+
+	public String getPlayerId() {
+		return playerId;
+	}
+
+	public void setPlayerId(String playerId) {
+		this.playerId = playerId;
+	}
 }

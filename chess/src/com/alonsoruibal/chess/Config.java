@@ -1,7 +1,6 @@
 package com.alonsoruibal.chess;
 
-import com.alonsoruibal.chess.book.Book;
-
+import java.awt.print.Book;
 import java.util.Arrays;
 
 /**
@@ -104,14 +103,6 @@ public class Config {
 
 	public void setUseBook(boolean useBook) {
 		this.useBook = useBook;
-	}
-
-	public Book getBook() {
-		return book;
-	}
-
-	public void setBook(Book book) {
-		this.book = book;
 	}
 
 	public int getBookKnowledge() {

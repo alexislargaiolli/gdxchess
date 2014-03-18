@@ -1,60 +1,76 @@
 package fr.alex.chess.model.ui;
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 
 import fr.alex.chess.ChessGame;
 
-public class PromotionWidget extends Table{
+public class PromotionWidget{
 	protected char promotion;
 	public static final float BUTTON_WIDTH = 150;
 	
-	public PromotionWidget(Skin skin){
-		super(skin);
-		TextButton btQueen = new TextButton(ChessGame.localize.getUiText("piece.queen"), skin);
-		TextButton btRook = new TextButton(ChessGame.localize.getUiText("piece.rook"), skin);
-		TextButton btKnight = new TextButton(ChessGame.localize.getUiText("piece.knight"), skin);
-		TextButton btBishop = new TextButton(ChessGame.localize.getUiText("piece.bishop"), skin);
+	private BitmapFont font;
+	private String queen;
+	private String rook;
+	private String knight;
+	private String bishop;
+	
+	private Rectangle queenPos;
+	private Rectangle rookPos;
+	private Rectangle knightPos;
+	private Rectangle bishopPos;
+	
+	public PromotionWidget(){
+		font = new BitmapFont();
 		
-		this.add(btQueen).width(BUTTON_WIDTH);
-		this.row();
-		this.add(btRook).width(BUTTON_WIDTH);
-		this.row();
-		this.add(btKnight).width(BUTTON_WIDTH);
-		this.row();
-		this.add(btBishop).width(BUTTON_WIDTH);
+		queen = ChessGame.localize.getUiText("piece.queen");
+		rook = ChessGame.localize.getUiText("piece.rook");
+		knight = ChessGame.localize.getUiText("piece.knight");
+		bishop = ChessGame.localize.getUiText("piece.bishop");
 		
-		btQueen.addListener(new ClickListener(){
-			public void clicked (InputEvent event, float x, float y) {
-				promotion = 'Q';
-				event.stop();
-			}
-		});
+		queenPos = new Rectangle(0, 0, 20 ,100);		
+		rookPos = new Rectangle(0, 0, 20 ,100);
+		knightPos = new Rectangle(0, 0, 20 ,100);
+		bishopPos = new Rectangle(0, 0, 20 ,100);		
 		
-		btRook.addListener(new ClickListener(){
-			public void clicked (InputEvent event, float x, float y) {
-				promotion = 'R';
-				event.stop();
-			}
-		});
-		
-		btKnight.addListener(new ClickListener(){
-			public void clicked (InputEvent event, float x, float y) {
-				promotion = 'K';
-				event.stop();
-			}
-		});
-		
-		btBishop.addListener(new ClickListener(){
-			public void clicked (InputEvent event, float x, float y) {
-				promotion = 'B';
-				event.stop();
-			}
-		});
 		reset();
+	}
+	
+	public void draw(SpriteBatch batch){
+		font.draw(batch, queen, queenPos.x, queenPos.y);
+		font.draw(batch, rook, rookPos.x, rookPos.y);
+		font.draw(batch, knight, knightPos.x, knightPos.y);
+		font.draw(batch, bishop, bishopPos.x, bishopPos.y);
+	}
+	
+	public void handleInput(float x, float y){
+		if(queenPos.contains(x, y)){
+			promotion = 'Q';
+		}
+		else if(rookPos.contains(x, y)){
+			promotion = 'R';
+		}
+		else if(knightPos.contains(x, y)){
+			promotion = 'K';
+		}
+		else if(bishopPos.contains(x, y)){
+			promotion = 'B';
+		}
+	}
+	
+	public void resize(float width, float height){
+		queenPos.x = width * .05f;
+		queenPos.y = height * .9f;
+		
+		rookPos.x = width * .05f;
+		rookPos.y = height * .75f;
+		
+		knightPos.x = width * .05f;
+		knightPos.y = height * .5f;
+		
+		bishopPos.x = width * .05f;
+		bishopPos.y = height * .35f;
 	}
 	
 	public char getPromotion() {

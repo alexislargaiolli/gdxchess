@@ -198,7 +198,7 @@ public class ChessCamController extends GestureDetector implements TweenAccessor
 
 	private void zoomOut() {
 		if (state == State.IDLE) {
-			Tween.to(this, ZOOM, 1).target(1f).ease(Back.OUT).start(ChessGame.tween).setCallback(new TweenCallback() {
+			Tween.to(this, ZOOM, 1).target(20f).ease(Back.OUT).start(ChessGame.tween).setCallback(new TweenCallback() {
 				@Override
 				public void onEvent(int type, BaseTween<?> source) {
 					switchState(State.IDLE);

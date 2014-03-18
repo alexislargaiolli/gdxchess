@@ -18,9 +18,6 @@ public class WSClient implements ComClient
 	private int port;
 	private WebSocketClient wsc; //Websocket
 	private boolean connected;
-	
-	//For the Client side only
-	private int myID;
 	private ClientMSG client;
 	
 	//For Bidirectional Communication mode
@@ -28,8 +25,6 @@ public class WSClient implements ComClient
 	{
 		this.port = port;
 		connected = false;
-		//this.connectClient(ip);
-		myID = -1;
 	}
 	
 	public void connectClient (String ip)
@@ -52,31 +47,11 @@ public class WSClient implements ComClient
 				@Override
 				public void onOpen( ServerHandshake handshake ) {
 					connected = true;
-					//requestID();
-					System.out.println("WSClient open.");
 				}
 				
 				@Override
 				public void onMessage( String message ) {
-					
-					//Low level control of Messages received from server
-					//SERVER CLOSES MY WS CONNECTION.
-					if (message.equals("MSG_CLOSE_WS")) 
-					{
-						this.close(); 
-					}
-
-					//SERVER SEND MY CLIENT ID.
-					else if (message.startsWith("MSG_SEND_ID"))
-					{
-						String [] values = message.split("\\s+"); //splitter with the " " separator
-						myID = Integer.valueOf(values[1]);	
-					}
-					//High level Message, send to the ClientMSG class
-					else
-					{
-						client.onMessage(message);		
-					}	
+					client.onMessage(message);
 				}
 
 				@Override
@@ -102,6 +77,7 @@ public class WSClient implements ComClient
 		{
 			System.out.println("WSClient send: " + msg);
 			wsc.send(msg);
+			//wsc.onMessage(arg0)
 			return true;
 		}
 		else return false;
@@ -110,11 +86,6 @@ public class WSClient implements ComClient
 	public boolean isConnected()
 	{
 		return connected;
-	}
-
-	public int getId()
-	{
-		return myID;
 	}
 	
 	public void close()
@@ -129,6 +100,12 @@ public class WSClient implements ComClient
 
 	public void setClient(ClientMSG client) {
 		this.client = client;
+	}
+
+	@Override
+	public int getId() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 

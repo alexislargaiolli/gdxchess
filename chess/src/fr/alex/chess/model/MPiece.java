@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
 
 import fr.alex.chess.ChessGame;
-import fr.alex.chess.Player;
 
 public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 
@@ -43,26 +42,20 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 
 	private BoundingBox boundingBox;
 
-	private MCase curCase;
-
-	private MCase nextCase;
-
 	private boolean white;
 
 	private boolean dead;
 
 	private final Color initialColor;
-	
-	private Player player;
-
 	protected Tween move;
+	protected String skin;
 
-	public MPiece(char p, ModelInstance instance, Player player) {
+	public MPiece(char p, ModelInstance instance, String skin) {
 		super();
+		this.skin = skin;
 		this.value = p;
-		this.player = player;
 		this.white = "RNBQKP".indexOf(value) >= 0;
-		this.position = new Vector3(0, ChessModelCreator.getDepth(p) * .5f, 0);
+		this.position = new Vector3(0, 0, 0);
 		this.instance = instance;
 		this.boundingBox = new BoundingBox();
 		this.instance.calculateBoundingBox(boundingBox);
@@ -74,8 +67,8 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 
 	public void promote(char p) {
 		this.value = p;
-		this.instance = ChessModelCreator.createPiece(p, player.getSkin());
-		position.y = ChessModelCreator.getDepth(p) * .5f;
+		this.instance = ChessGame.model.createPiece(p, skin);
+		position.y = ChessGame.model.getDepth(p) * .5f;
 		instance.transform.setToTranslation(position.x, position.y, position.z);
 		this.hightlight(false);
 		// setPosition(position.x, position.y);
@@ -102,33 +95,31 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 		}
 	}
 
-	public void moveTo(MCase dest) {
-		move = Tween.to(this, POSITION_XZ, 0.5f).target(dest.getPosition().x, dest.getPosition().z).start(ChessGame.tween);
-		this.nextCase = dest;
+	public void move(Vector3 dest, boolean anim){
+		if (!anim) {
+			setPosition(dest.x, dest.z);
+		} else {
+			move = Tween.to(this, POSITION_XZ, 0.5f).target(dest.x, dest.z).start(ChessGame.tween);
+		}
 	}
 
 	public void update(float delta) {
 		if (move != null) {
 			if (move.isFinished()) {
-				move = null;
-				if (curCase.getCurPiece().equals(this)) {
-					curCase.setCurPiece(null);
-				}
-				curCase = nextCase;
-				curCase.setCurPiece(this);
+				move = null;				
 			}
 		}
 	}
 
 	private void updateBoundingBox(float x, float z) {
 		Vector3 min = boundingBox.min;
-		min.x = x - ChessModelCreator.getWidth(value) * .5f;
-		min.y = position.y - ChessModelCreator.getHeight(value) * .5f;
-		min.z = z - ChessModelCreator.getDepth(value) * .5f;
+		min.x = x - ChessGame.model.getWidth(value) * .5f;
+		min.y = position.y - ChessGame.model.getHeight(value) * .5f;
+		min.z = z - ChessGame.model.getDepth(value) * .5f;
 		Vector3 max = boundingBox.max;
-		max.x = x + ChessModelCreator.getWidth(value) * .5f;
-		max.y = position.y + ChessModelCreator.getHeight(value) * .5f;
-		max.z = z + ChessModelCreator.getDepth(value) * .5f;
+		max.x = x + ChessGame.model.getWidth(value) * .5f;
+		max.y = position.y + ChessGame.model.getHeight(value) * .5f;
+		max.z = z + ChessGame.model.getDepth(value) * .5f;
 		boundingBox.set(min, max);
 	}
 
@@ -146,14 +137,6 @@ public class MPiece extends MChessEntity implements TweenAccessor<MPiece> {
 
 	public BoundingBox getBoundingBox() {
 		return boundingBox;
-	}
-
-	public MCase getCurCase() {
-		return curCase;
-	}
-
-	public void setCurCase(MCase curCase) {
-		this.curCase = curCase;
 	}
 
 	public boolean isWhite() {
